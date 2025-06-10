@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Chat com Múltiplas Salas</title>
+</head>
+<body>
+  <h1>Chat com Salas</h1>
+
+  <label for="roomSelect">Escolha a sala:</label>
+  <select id="roomSelect">
+    <option value="sala1">Sala 1</option>
+    <option value="sala2">Sala 2</option>
+    <option value="sala3">Sala 3</option>
+    <option value="sala4">Sala 4</option>
+  </select>
+  <button onclick="joinRoom()">Entrar na Sala</button>
+
+  <div id="chat" style="display:none;">
+    <ul id="messages"></ul>
+    <input id="msgInput" autocomplete="off" /><button onclick="sendMessage()">Enviar</button>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    let currentRoom = '';
+
+    function joinRoom() {
+      const room = document.getElementById('roomSelect').value;
+      socket.emit('joinRoom', room);
+      currentRoom = room;
+      document.getElementById('chat').style.display = 'block';
+    }
+
+    function sendMessage() {
+      const input = document.getElementById('msgInput');
+      const msg = input.value;
+      socket.emit('chatMessage', msg);
+      input.value = '';
+    }
+
+    socket.on('chatMessage', msg => {
+      const item = document.createElement('li');
+      item.textContent = msg;
+      document.getElementById('messages').appendChild(item);
+    });
+  </script>
+</body>
+</html>
